@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Providers;
+
 use App\Models\Logo;
 use App\Models\SchoolName;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,15 +25,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+
         Paginator::useBootstrapFive();
+
         View::composer('backend.body.header', function ($view) {
             $view->with('profileData', Auth::user());
         });
+
         View::composer('backend.body.sidebar', function ($view) {
             $view->with('profileData', Auth::user());
             $view->with('logo', Logo::first());
             $view->with('schoolName', SchoolName::first());
         });
+
         View::composer('backend.body.changepassword', function ($view) {
             $view->with('profileData', Auth::user());
         });
